@@ -1,60 +1,64 @@
 # my-stock-team
 
-종목명을 입력하면 **여러 애널리스트 서브에이전트가 협업**해 가치투자 관점의 리서치를 수행하고,
-**검증 애널리스트**의 품질 점검을 거쳐 **디자인된 PPTX/PDF 리포트**로 내보내는 Claude Code 플러그인입니다.
+**종목명만 말하면, 여러 애널리스트 AI가 협업해 리서치하고 디자인된 PPTX/PDF 리포트까지 만들어 주는 Claude Code 플러그인입니다.**
 
-## 구성
+펀더멘털·차트·뉴스·리스크를 각각 맡은 4개 애널리스트 서브에이전트가 분석하고, 검증 담당이 품질을 점검한 뒤 리포트로 내보냅니다. (가치투자 관점 · 한국/미국 종목 · 무료 공개 데이터 기반 학습용)
 
-```
-my-stock-team/
-├── .claude-plugin/
-│   ├── plugin.json          # 플러그인 매니페스트 (name: my-stock-team, v1.0.0)
-│   └── marketplace.json     # 설치 카탈로그
-├── agents/                  # 서브에이전트 5종
-│   ├── fundamental-analyst.md         # 재무·공시 (DART, 한국)
-│   ├── market-technical-analyst.md    # 가격·추세 (FinanceDataReader, 한·미)
-│   ├── news-sentiment-analyst.md      # 뉴스·심리 (웹서치, 한·미)
-│   ├── risk-manager-synthesizer.md    # 리스크 종합·리드 (pykrx)
-│   └── report-qa-validator.md         # 검증(품질 점검) 게이트
-├── skills/
-│   └── report-pptx/         # 리포트 → PPTX/PDF 생성 스킬
-│       ├── SKILL.md
-│       ├── build_pptx.py
-│       └── build_pdf.py
-└── commands/
-    ├── stock-research.md    # /stock-research <종목>  — 전체 파이프라인
-    └── export-report.md     # /export-report <종목>   — PPTX/PDF 내보내기
-```
+## 설치
 
-## 설치 (마켓플레이스)
+Claude Code에서 아래 두 줄을 실행하세요.
 
 ```
-/plugin marketplace add <이 저장소 경로 또는 git URL>
+/plugin marketplace add sotti7263/my-stock-team
 /plugin install my-stock-team@my-stock-team
 ```
 
-## 사용
+## 사용법
+
+설치 후 분석하고 싶은 종목을 말하면 됩니다.
 
 ```
-/stock-research 삼성물산      # 데이터 수집 → 협업 → 리스크 종합 → 검증 → reports/삼성물산.md
-/export-report 삼성물산        # reports/삼성물산.md → .pptx / .pdf
+삼성전자 분석해줘
+```
+
+또는 커맨드로 단계를 직접 부를 수도 있습니다.
+
+```
+/stock-research 삼성전자      # 데이터 수집 → 협업 분석 → 리스크 종합 → 검증 → reports/삼성전자.md
+/export-report 삼성전자        # 위 리포트를 PPTX·PDF로 내보내기
 ```
 
 ## 사전 준비
 
-- **DART API 키**: 한국 종목 재무 분석에 필요합니다. 프로젝트 루트에 `.env` 를 만들고 본인 키를 넣으세요.
-  `.env.example` 를 복사해 사용합니다. **키 값은 이 플러그인에 포함되어 있지 않습니다.**
-  ```
-  cp .env.example .env   # 그리고 DART_KEY 에 본인 키 입력
-  ```
-  DART 키 발급: https://opendart.fss.or.kr/
-- **파이썬 의존성**: `pip install python-pptx matplotlib`
-- 가격 데이터(FinanceDataReader)·유동성(pykrx)·뉴스(웹서치)는 키가 필요 없습니다.
+### 1) DART API 키 (한국 종목 재무 분석에 필요)
 
-## 가드레일 (모든 리포트 공통)
-- 모든 수치에 `(출처: 데이터명, 연도/날짜)` 표기, 출처 없는 수치 금지
-- 데이터 미확보 시 "확인 불가", 출처 없는 뉴스·루머는 "미확인"
-- 매수/매도/보유·목표가·비중 단정 금지 — 판단 근거 정리까지만, 최종 판단은 사람
-- 첫머리 "무료 공개 데이터 기반 학습용" 한 줄 + 끝에 데이터 출처·기준일 목록
+DART 키는 **각자 발급해서 넣어야 합니다** (보안상 플러그인에 포함되어 있지 않습니다).
 
-본 플러그인의 산출물은 학습용 분석이며 투자 권유가 아닙니다.
+1. https://opendart.fss.or.kr/ 에서 무료 발급 (가입 → 인증키 신청, 수 분 소요)
+2. 프로젝트 폴더에 `.env` 파일을 만들고 본인 키를 입력합니다.
+   ```
+   DART_KEY=발급받은_본인_키
+   ```
+   (`.env.example` 를 복사해 쓰면 됩니다. `.env` 는 git에 올라가지 않습니다.)
+
+> 가격 데이터·유동성·뉴스 검색은 키가 필요 없습니다. **DART 키는 한국 종목의 재무·공시 분석에만** 쓰입니다.
+
+### 2) 파이썬 패키지 (리포트 내보내기에 필요)
+
+```
+pip install python-pptx matplotlib
+```
+
+## 구성
+
+| 폴더 | 내용 |
+|------|------|
+| `agents/` | 애널리스트 5종 — 펀더멘털 · 차트 · 뉴스심리 · 리스크종합 · 검증 |
+| `skills/report-pptx/` | 리포트(.md) → 디자인된 PPTX/PDF 변환 |
+| `commands/` | `/stock-research`, `/export-report` |
+
+## 알아두기
+
+- 모든 수치에는 출처와 기준일이 함께 표기되며, 출처 없는 수치는 싣지 않습니다.
+- 매수/매도·목표가 같은 투자 행동 단정은 하지 않습니다 — 판단 근거 정리까지만 제공하며, **최종 판단은 사람의 몫**입니다.
+- 본 플러그인의 산출물은 **무료 공개 데이터 기반 학습용 분석이며, 투자 권유가 아닙니다.**
