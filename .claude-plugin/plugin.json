@@ -1,0 +1,10 @@
+{
+  "name": "my-stock-team",
+  "version": "1.0.0",
+  "description": "종목명을 입력하면 4개 애널리스트 서브에이전트가 협업해 리서치하고, 검증 애널리스트의 품질 점검을 거쳐 디자인된 PPTX/PDF 리포트로 내보내는 가치투자 리서치 팀 플러그인입니다.",
+  "author": {
+    "name": "stock-team"
+  },
+  "keywords": ["stock", "research", "value-investing", "dart", "kospi", "pptx", "report"],
+  "license": "MIT"
+}

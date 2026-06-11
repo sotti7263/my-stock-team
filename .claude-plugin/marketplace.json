@@ -1,0 +1,18 @@
+{
+  "name": "my-stock-team",
+  "owner": {
+    "name": "stock-team"
+  },
+  "description": "가치투자 종목 리서치 팀 플러그인 카탈로그입니다.",
+  "plugins": [
+    {
+      "name": "my-stock-team",
+      "source": "./",
+      "description": "4개 애널리스트(펀더멘털·기술적·뉴스심리·리스크종합) + 검증 애널리스트 + 리포트(PPTX/PDF) 스킬과 실행 커맨드 묶음입니다.",
+      "version": "1.0.0",
+      "author": {
+        "name": "stock-team"
+      }
+    }
+  ]
+}
